@@ -54,7 +54,9 @@ public class RcPacket {
         this.size = size;
         this.id = leBytesToInt32(packetBytes);
         this.cmd = leBytesToInt32(copyOfRange(packetBytes, 4, 8));
-        this.body = copyOfRange(packetBytes, 8, size - 2); /* -2 for the body and packet terminator*/
+        this.body = copyOfRange(packetBytes, 8, size - 2); /* -2 for the body 
+                                                            * and packet 
+                                                            * terminator*/
         
         if (packetBytes[size - 2] != (byte)0x00 ||
             packetBytes[size - 1] != (byte)0x00) {
@@ -102,13 +104,41 @@ public class RcPacket {
         return buffer;        
     }
 
+    private static byte[] filterColorBytes(byte[] input) {
+        byte[] output = new byte[input.length];
+        int currentOutputIndex = 0;
+        
+        for (int i = 0; i < input.length; i++) {
+            if (input[i] == (byte) 0xc2) {
+                // Skip this byte but also the following 2
+                i += 2;
+            } else {
+                output[currentOutputIndex++] = input[i];
+            }
+        }
+        return copyOfRange(output, 0, currentOutputIndex);
+    }
+
+    public static String printHexBinary(byte[] bytes) {
+        String[] sArr = new String[bytes.length];
+
+        for (int i = 0; i < bytes.length; i++) {
+            sArr[i] = String.format("%02x", bytes[i]);
+        }
+
+        return String.join(" ", sArr);
+    }
+
     @Override
     public String toString() {
+        //return printHexBinary(filterColorBytes(this.body));
+        
         try {
-            return new String(this.body, "UTF-8");
+            
+            return new String(filterColorBytes(this.body), "UTF-8");
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(RcPacket.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return "Could not decode body " + Arrays.toString(this.body);
+        return "Could not decode body(UTF-8) " + Arrays.toString(this.body);
     }  
 }

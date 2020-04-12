@@ -208,11 +208,16 @@ public class Main {
             RcPacket ret = receive();
             
             if (ret.cmd == SERVERDATA_AUTH_RESPONSE) {
-                System.out.println("We are succesfully authenticated");
+                System.out.println("Succesfully authenticated");
             }
 
             send(RCON_PID, SERVERDATA_EXECCOMMAND, command);       
             ret = receive();
+            if (ret.cmd == SERVERDATA_RESPONSE_VALUE) {
+                System.out.print("[RESPONSE]> ");
+            } else {
+                System.err.println("Unexpected response ...");
+            }
             System.out.println(ret.toString());
 
   
