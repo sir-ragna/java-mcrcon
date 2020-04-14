@@ -87,8 +87,7 @@ public class Main {
                 throw new IOException("Unable to read packet bytes");
             }
             
-            RcPacket rp = new RcPacket(rcPacketSize, rcPacketBytes);
-            return rp;            
+            return new RcPacket(rcPacketSize, rcPacketBytes);
     }
 
     /* WORKING WITH BYTE ARRAYS */
@@ -156,10 +155,10 @@ public class Main {
         if (env.containsKey("MCRCON_PASS")) {
             password = env.get("MCRCON_PASS");
         }
-        
+       
         String command = "";
         int i = 0;
-        String arg = args[i];
+        String arg = (args.length == 0 ? "" : args[i]);
 
         while (arg.startsWith("-")) {
             if (arg.equals("-H") || arg.equals("--host")) {
@@ -174,7 +173,7 @@ public class Main {
                     System.err.println("Port: " + args[i+1]);
                 }
             }
-
+            
             if (arg.equals("-p") || arg.equals("--password")) {
                 password = args[i+1];
             }
@@ -190,6 +189,11 @@ public class Main {
         }
         
         command = String.join(" ", copyOfRange(args, i, args.length));
+
+        if (command.equals("")) {
+            System.out.println("Please provide a command to execute");
+            System.exit(1);
+        }
 
         if (env.containsKey("MCRCON_VERBOSE") && env.get("MCRCON_VERBOSE").equals("yes")) {
             System.out.println(String.format("Host: %s", host));
